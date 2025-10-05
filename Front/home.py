@@ -1,13 +1,13 @@
-
-# Front/home.py
 import streamlit as st
 from pathlib import Path
 import pandas as pd
 import altair as alt
 import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
 
-st.set_page_config(page_title="Minima accion - Explorando exoplanetas", layout="wide")
-
+st.set_page_config(page_title="Mínima acción - Cazando exoplanetas", layout="wide")
+st.logo("static/logo.jpeg", link="https://www.linkedin.com/in/juan-sosa-997405294/", icon_image="static/logo.jpeg")
 st.markdown(
     """
     <style>
@@ -30,7 +30,8 @@ st.markdown(
         }
     }
 
-    .hero { font-size:30px; font-weight:700; color:var(--hero-text); }
+    .hero { font-size:30px; font-weight:700; color:var(--hero-text); margin-bottom: 8px; }
+    .subtitle { font-size:18px; color:var(--muted); margin-bottom: 24px; }
     .muted { color: var(--muted); }
     .card {
         background-color: var(--card-bg);
@@ -41,6 +42,13 @@ st.markdown(
         box-shadow: 0 1px 2px rgba(0,0,0,0.04);
     }
     .metric-value { font-size:26px; font-weight:700; color: var(--card-text); }
+    .section-header { 
+        font-size: 22px; 
+        font-weight: 600; 
+        margin-top: 32px; 
+        margin-bottom: 16px;
+        color: var(--hero-text);
+    }
     </style>
     """,
     unsafe_allow_html=True,
@@ -48,9 +56,8 @@ st.markdown(
 
 
 # --- Header / Hero ---
-st.markdown('<div class="hero">KOI Predictor — Hunting for Exoplanets with AI</div>', unsafe_allow_html=True)
-st.markdown("### Un vistazo visual a los candidatos y sus propiedades")
-st.write("")
+st.markdown('<div class="hero">Mínima Acción – Cazando exoplanetas</div>', unsafe_allow_html=True)
+st.markdown('<div class="subtitle">Un vistazo visual a los candidatos y sus propiedades</div>', unsafe_allow_html=True)
 
 # --- Importance text ---
 st.markdown("#### ¿Por qué importa esto?")
@@ -61,7 +68,7 @@ st.write(
     "la exploración científica como la validación rápida de nuevos candidatos."
 )
 
-st.write("---")
+st.divider()
 
 # --- Load CSV (ruta relativa desde Front/) ---
 DATA_PATH = Path(__file__).resolve().parent.parent.joinpath("Back", "predicciones.csv")
@@ -81,9 +88,9 @@ else:
 # -------------------------
 # Modelo / Métricas (visual)
 # -------------------------
-st.markdown("## Resumen del modelo y métricas")
+st.markdown('<div class="section-header">Resumen del modelo y métricas</div>', unsafe_allow_html=True)
 
-# Leaderboard (hardcoded a partir del texto que pegaste)
+# Leaderboard
 leaderboard_df = pd.DataFrame({
     "model": [
         "WeightedEnsemble_L2",
@@ -96,7 +103,7 @@ leaderboard_df = pd.DataFrame({
     "stack_level": [2, 1, 1],
 })
 
-# Key metrics (inyectadas)
+# Key metrics
 roc_auc = 0.9853
 pr_auc = 0.9653
 tn, fp, fn, tp = 1981, 65, 93, 731
@@ -107,18 +114,18 @@ support_total = tn + fp + fn + tp
 col1, col2 = st.columns([2, 3])
 
 with col1:
-    st.markdown("#### Leaderboard (top modelos)")
-    # ordenar por score_test y mostrar
-    st.dataframe(leaderboard_df.sort_values("score_test", ascending=False).reset_index(drop=True).style.format({
-        "score_test": "{:.6f}",
-        "score_val": "{:.6f}",
-        "pred_time_test": "{:.3f}",
-        "pred_time_val": "{:.3f}",
-        "fit_time": "{:.1f}"
-    }))
+    st.markdown("**Leaderboard (top modelos)**")
+    st.dataframe(
+        leaderboard_df.sort_values("score_test", ascending=False).reset_index(drop=True).style.format({
+            "score_test": "{:.6f}",
+            "score_val": "{:.6f}",
+            "fit_time": "{:.1f}"
+        }),
+        hide_index=True
+    )
 
 with col2:
-    # Métricas visuales (tarjetas sencillas)
+    st.write("")
     mcol1, mcol2 = st.columns(2)
     st.write("")
     mcol3, mcol4 = st.columns(2) 
@@ -132,46 +139,37 @@ with col2:
                    f'<div class="metric-value">{fp:,}</div></div>', unsafe_allow_html=True)
     st.write("")
     st.markdown("**Nota:** el predictor fue entrenado con `eval_metric='roc_auc'` para maximizar ROC-AUC.")
-    st.write("")  # espacio
 
-st.write("---")
+st.divider()
 
-# -------------------------
-# Top features (importancia)
-# -------------------------
-st.markdown("## Top features (importancia)")
+st.markdown('<div class="section-header">Top features (importancia)</div>', unsafe_allow_html=True)
 
-# Top features (mostramos top 5 que proporcionaste)
+# Top features
 fi_df = pd.DataFrame({
     "feature": ["koi_model_snr", "koi_count", "koi_prad", "duration_anomaly", "koi_dicco_mdec"],
     "importance": [0.039159, 0.004997, 0.004494, 0.003061, 0.002622]
-}).sort_values("importance", ascending=True)  # orden ascendente para barh
+}).sort_values("importance", ascending=True)
 
-# gráfico de barras horizontales (Altair)
-bar = alt.Chart(fi_df).mark_bar().encode(
+# Gráfico de barras horizontales (Altair)
+bar = alt.Chart(fi_df).mark_bar(color="#1f77b4").encode(
     x=alt.X("importance:Q", title="Importancia"),
     y=alt.Y("feature:N", sort='-x', title="Feature"),
     tooltip=[alt.Tooltip("feature:N"), alt.Tooltip("importance:Q", format=".6f")]
 ).properties(height=220)
 st.altair_chart(bar, use_container_width=True)
 
-# mostrar tabla simple con top features
-st.dataframe(fi_df.sort_values("importance", ascending=False).reset_index(drop=True).style.format({"importance": "{:.6f}"}))
+st.divider()
 
-st.write("---")
-
-# --- Stacked plots (uno encima del otro), puntos más grandes ---
-st.markdown("## Exploracion de Resultados visual")
+st.markdown('<div class="section-header">Exploración de resultados visual</div>', unsafe_allow_html=True)
 
 if df is None:
     st.info("Sube o genera `Back/predicciones.csv` y recarga la página para ver las gráficas.")
 else:
-    # ---------- Top: Kepler vs G-band ----------
-    st.markdown("### Kepler Magnitude vs G-band Magnitude")
+    st.markdown("**Kepler Magnitude vs G-band Magnitude**")
 
     x_col = "koi_kepmag"
     y_col = "koi_gmag"
-    color_col = "koi_steff"  # temperatura para colorear
+    color_col = "koi_steff"
     size_col = "koi_model_snr"
 
     missing = [c for c in (x_col, y_col) if c not in df.columns]
@@ -208,10 +206,9 @@ else:
         chart = chart.properties(width=900, height=500).interactive()
         st.altair_chart(chart, use_container_width=True)
 
-    st.write("---")
+    st.write("")
 
-    # ---------- Bottom: Spatial Distribution (RA vs Dec) ----------
-    st.markdown("### Spatial Distribution (RA vs Dec)")
+    st.markdown("**Spatial Distribution (RA vs Dec)**")
 
     ra_col = "ra"
     dec_col = "dec"
@@ -251,7 +248,6 @@ else:
                 tooltip=[alt.Tooltip(f"{t}", format=".3f") if sp_df[t].dtype.kind in "fi" else alt.Tooltip(f"{t}") for t in tooltip_sp]
             )
 
-            # asegurar target como string para evitar mismatch de tipo en domain/color
             if color_spatial in sp_df.columns:
                 sp_df[color_spatial] = sp_df[color_spatial].astype(str).fillna("nan")
                 unique_vals = list(sp_df[color_spatial].dropna().unique())
@@ -274,7 +270,6 @@ else:
             else:
                 chart_sp = base_sp
 
-            # aplicar zoom si hay intersección con los datos
             zoom_x = [280, 304]
             zoom_y = [41, 49]
             x_ok = not (ra_max < zoom_x[0] or ra_min > zoom_x[1])
@@ -293,11 +288,163 @@ else:
             ).interactive()
 
             st.altair_chart(chart_sp, use_container_width=True)
-st.write("---")
 
+st.divider()
 
-# --- Explanation about the interface ---
-st.markdown("## Sobre la interfaz")
+DATA_ORIG = Path(__file__).resolve().parent.parent.joinpath("Data", "1_cumulative_2025.csv")
+st.markdown('<div class="section-header">Exploración del dataset original (KOI)</div>', unsafe_allow_html=True)
+st.markdown(f"**Fuente:** `{DATA_ORIG}`")
+
+if not DATA_ORIG.exists():
+    st.warning("No se encontró ../Data/1_cumulative_2025.csv. Coloca el CSV y recarga la página.")
+else:
+    try:
+        df_orig = pd.read_csv(DATA_ORIG, low_memory=False)
+    except Exception as e:
+        st.error(f"Error leyendo el CSV original: {e}")
+        df_orig = None
+
+    if df_orig is None or df_orig.empty:
+        st.info("Dataset vacío o no se pudo leer.")
+    else:
+        st.markdown("**Clasificación de objetos Kepler (KOI)**")
+        
+        if "koi_disposition" in df_orig.columns:
+            df_orig["koi_disposition"] = df_orig["koi_disposition"].astype(str).str.strip()
+            counts = df_orig["koi_disposition"].value_counts(dropna=False)
+            
+            sns.set_style("whitegrid")
+            sns.set_palette("husl")
+            
+            fig, ax = plt.subplots(figsize=(8, 5))
+            
+            colors = ['#2ecc71', '#3498db', '#e74c3c', '#95a5a6']
+            sns.countplot(
+                data=df_orig,
+                x="koi_disposition",
+                order=counts.index,
+                palette=colors[:len(counts)],
+                ax=ax
+            )
+            
+            ax.set_title("Clasificación de objetos Kepler (KOI)", fontsize=14, fontweight='bold', pad=15)
+            ax.set_xlabel("Disposición", fontsize=12)
+            ax.set_ylabel("Cantidad", fontsize=12)
+            plt.xticks(rotation=45, ha="right")
+            
+            total = len(df_orig)
+            for p in ax.patches:
+                height = p.get_height()
+                if total > 0:
+                    perc = f"{(height / total * 100):.1f}%"
+                    ax.annotate(
+                        perc,
+                        (p.get_x() + p.get_width() / 2., height),
+                        ha="center",
+                        va="bottom",
+                        fontsize=10,
+                        fontweight='bold',
+                        color="#2c3e50",
+                        xytext=(0, 5),
+                        textcoords="offset points"
+                    )
+            
+            plt.tight_layout()
+            st.pyplot(fig)
+            plt.close(fig)
+        
+        st.write("")
+        
+        st.markdown("**Distribuciones de propiedades planetarias**")
+        
+        required_cols = ["koi_prad", "koi_period", "koi_teq"]
+        available_cols = [col for col in required_cols if col in df_orig.columns]
+        
+        if len(available_cols) == 3:
+            sns.set_style("whitegrid")
+            plt.rcParams['font.size'] = 10
+            
+            fig, axes = plt.subplots(1, 3, figsize=(18, 5))
+            
+            colors = ['#e74c3c', '#3498db', '#f39c12']
+            
+            valid_prad = df_orig["koi_prad"].dropna()
+            if len(valid_prad) > 0:
+                sns.histplot(
+                    valid_prad, 
+                    bins=50, 
+                    log_scale=(True, False), 
+                    ax=axes[0],
+                    color=colors[0],
+                    edgecolor='white',
+                    alpha=0.8
+                )
+                axes[0].set_xlabel("Radio planetario [R⊕]", fontsize=11, fontweight='bold')
+                axes[0].set_title("Distribución del radio planetario", fontsize=12, fontweight='bold', pad=10)
+                axes[0].grid(True, alpha=0.3)
+            
+            valid_period = df_orig["koi_period"].dropna()
+            if len(valid_period) > 0:
+                sns.histplot(
+                    valid_period, 
+                    bins=50, 
+                    log_scale=(True, False), 
+                    ax=axes[1],
+                    color=colors[1],
+                    edgecolor='white',
+                    alpha=0.8
+                )
+                axes[1].set_xlabel("Periodo orbital [días]", fontsize=11, fontweight='bold')
+                axes[1].set_title("Distribución del periodo orbital", fontsize=12, fontweight='bold', pad=10)
+                axes[1].grid(True, alpha=0.3)
+            
+            valid_teq = df_orig["koi_teq"].dropna()
+            if len(valid_teq) > 0:
+                sns.histplot(
+                    valid_teq, 
+                    bins=50, 
+                    ax=axes[2],
+                    color=colors[2],
+                    edgecolor='white',
+                    alpha=0.8
+                )
+                axes[2].set_xlabel("Temperatura de equilibrio [K]", fontsize=11, fontweight='bold')
+                axes[2].set_title("Distribución de temperatura de equilibrio", fontsize=12, fontweight='bold', pad=10)
+                axes[2].grid(True, alpha=0.3)
+            
+            plt.tight_layout()
+            st.pyplot(fig)
+            plt.close(fig)
+            
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                if len(valid_prad) > 0:
+                    st.metric("Radio mediano", f"{valid_prad.median():.2f} R⊕")
+            with col2:
+                if len(valid_period) > 0:
+                    st.metric("Periodo mediano", f"{valid_period.median():.2f} días")
+            with col3:
+                if len(valid_teq) > 0:
+                    st.metric("Temp. mediana", f"{valid_teq.median():.0f} K")
+                    
+        else:
+            st.warning(f"No se encontraron todas las columnas necesarias. Disponibles: {available_cols}")
+        
+        st.markdown(
+            """
+            <div style='background-color: rgba(52, 152, 219, 0.1); padding: 15px; border-radius: 8px; margin-top: 20px;'>
+            <p style='margin: 0; font-size: 14px;'>
+            <strong>Nota:</strong> Los histogramas muestran las distribuciones de propiedades clave de los candidatos a exoplanetas. 
+            El radio y periodo usan escala logarítmica en el eje X para visualizar mejor la amplia gama de valores.
+            </p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+st.divider()
+
+st.markdown('<div class="section-header">Sobre la interfaz</div>', unsafe_allow_html=True)
 st.write(
     "Esta interfaz combina herramientas para transformar automáticamente CSVs KOI y para ejecutar "
     "modelos de clasificación entrenados con AutoGluon. En el panel de predicción puedes subir "
@@ -305,22 +452,16 @@ st.write(
     "de entrenamiento puedes crear/derivar un target, ajustar parámetros de entrenamiento y "
     "reentrenar un predictor localmente."
 )
-st.write(
-    "Debajo encontrarás accesos rápidos a las páginas principales del proyecto (predicción y entrenamiento)."
+st.info(
+    "A la izquierda podrás encontrar links a estas páginas, además de un link a una página sobre nosotros y un canvas para desestresarte."
 )
 
-# --- Quick links to other pages (instructions) ---
-col1, col2 = st.columns(2)
-with col1:
-    st.markdown("**Interfaz de predicción**")
-    st.code("cd Front\nstreamlit run pagina_predictor.py", language="bash")
-with col2:
-    st.markdown("**Interfaz de entrenamiento**")
-    st.code("cd Front\nstreamlit run pagina_modelo.py", language="bash")
-
-st.write("---")
-
-# --- Footer ---
-st.markdown("<div style='font-size:12px;color:#6c757d'>© Proyecto KOI Predictor — Visualización y herramientas para exploración de candidatos. Datos cargados desde `Back/predicciones.csv`.</div>", unsafe_allow_html=True)
-
-
+st.markdown(
+    """
+    <div style='margin-top: 60px; padding: 20px; text-align: center; font-size: 12px; color: #6c757d; border-top: 1px solid #e0e0e0;'>
+    © Proyecto KOI Predictor – Visualización y herramientas para exploración de candidatos<br>
+    Datos cargados desde <code>Back/predicciones.csv</code>
+    </div>
+    """, 
+    unsafe_allow_html=True
+)

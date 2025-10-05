@@ -8,7 +8,7 @@ from transform_input import auto_transform, load_sample_stats
 
 st.set_page_config(page_title="KOI Predictor - v0.0.1", layout="wide")
 st.title("KOI Predictor")
-st.logo("static/logo.jpg", link="https://www.linkedin.com/in/juan-sosa-997405294/", icon_image="static/logo.jpg")
+st.logo("static/logo.jpeg", link="https://www.linkedin.com/in/juan-sosa-997405294/", icon_image="static/logo.jpeg")
 
 def _load_predictor(path):
     """Callback: carga predictor y lo guarda en session_state"""
