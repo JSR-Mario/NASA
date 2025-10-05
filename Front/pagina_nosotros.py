@@ -6,7 +6,6 @@ from PIL import Image
 # El layout "wide" aprovecha mejor el espacio en pantallas grandes.
 st.set_page_config(page_title="Sobre Nosotros", page_icon="👥", layout="wide")
 
-st.logo("static/logo.jpeg", link="https://www.linkedin.com/in/juan-sosa-997405294/", icon_image="static/logo.jpeg")
 
 # --- DATOS DEL EQUIPO ---
 # Estructura: "Nombre": [imagen_path, linkedin_url, github_url, quote]

@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 st.set_page_config(page_title="Mínima acción - Cazando exoplanetas", layout="wide")
-st.logo("static/logo.jpeg", link="https://www.linkedin.com/in/juan-sosa-997405294/", icon_image="static/logo.jpeg")
 st.markdown(
     """
     <style>

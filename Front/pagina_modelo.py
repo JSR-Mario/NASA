@@ -14,7 +14,6 @@ import json
 st.set_page_config(page_title="KOI Trainer - v0.0.1", layout="wide")
 st.title("KOI - Entrenar nuevo predictor (versión mínima)")
 
-st.logo("static/logo.jpeg", link="https://www.linkedin.com/in/juan-sosa-997405294/", icon_image="static/logo.jpeg")
 
 # ---------------- Helpers ----------------
 def parse_drop_cols(text: str):
