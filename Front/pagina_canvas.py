@@ -4,6 +4,7 @@ import streamlit as st
 from streamlit_drawable_canvas import st_canvas
 
 st.title("Canvas para distraerte")
+st.logo("static/logo.jpg", link="https://www.linkedin.com/in/juan-sosa-997405294/", icon_image="static/logo.jpg")
 
 # Specify canvas parameters in application
 drawing_mode = st.sidebar.selectbox(
