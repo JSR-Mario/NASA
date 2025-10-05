@@ -1,9 +1,8 @@
-# transform_input.py
 from pathlib import Path
 import numpy as np
 import pandas as pd
 
-predictor_features = ['kepid','koi_period','koi_time0bk','koi_time0','koi_eccen','koi_impact','koi_duration','koi_depth','koi_ror','koi_srho','koi_prad','koi_sma','koi_incl','koi_teq','koi_insol','koi_dor','koi_ldm_coeff2','koi_ldm_coeff1','koi_max_sngle_ev','koi_model_snr','koi_count','koi_num_transits','koi_tce_plnt_num','koi_steff','koi_slogg','koi_smet','koi_srad','koi_smass','ra','dec','koi_kepmag','koi_gmag','koi_rmag','koi_imag','koi_zmag','koi_jmag','koi_hmag','koi_kmag','koi_fwm_stat_sig','koi_fwm_sra','koi_fwm_sdec','koi_fwm_srao','koi_fwm_sdeco','koi_fwm_prao','koi_fwm_pdeco','koi_dicco_mra','koi_dicco_mdec','koi_dikco_mra','koi_dikco_mdec','kepler_ratio','temp_ratio','duration_anomaly','ultra_deep','log_period','log_depth','log_prad','log_teq','transit_ratio','temp_period_ratio','impact_squared','transit_morgan','koi_fittype','koi_quarters','koi_sparprov','period_class']
+predictor_features = ['kepid','koi_period','koi_time0bk','koi_time0','koi_eccen','koi_impact','koi_duration','koi_depth','koi_ror','koi_srho','koi_prad','koi_sma','koi_incl','koi_teq','koi_insol','koi_dor','koi_ldm_coeff2','koi_ldm_coeff1','koi_max_sngle_ev','koi_model_snr','koi_count','koi_num_transits','koi_tce_plnt_num','koi_steff','koi_slogg','koi_smet','koi_srad','koi_smass','ra','dec','koi_kepmag','koi_gmag','koi_rmag','koi_imag','koi_zmag','koi_jmag','koi_hmag','koi_kmag','koi_fwm_stat_sig','koi_fwm_sra','koi_fwm_sdec','koi_fwm_srao','koi_fwm_sdeco','koi_fwm_prao','koi_fwm_pdeco','koi_dicco_mra','koi_dicco_mdec','koi_dikco_mra','koi_dikco_mdec','kepler_ratio','temp_ratio','duration_anomaly','ultra_deep','log_period','log_depth','log_prad','log_teq','transit_ratio','temp_period_ratio','impact_squared','transit_morgan','caida_brillo','koi_fittype','koi_quarters','koi_sparprov','period_class']
 
 drop_cols = [
     'koi_longp', 'koi_model_chisq', 'koi_model_dof', 'koi_ingress', 'koi_sage',
@@ -88,6 +87,7 @@ def auto_transform(df_orig: pd.DataFrame, sample_stats_df: pd.DataFrame | None =
     srho = pd.to_numeric(df.get('koi_srho'), errors='coerce')
     teq = pd.to_numeric(df.get('koi_teq'), errors='coerce')
     depth = pd.to_numeric(df.get('koi_depth'), errors='coerce')
+    ror = pd.to_numeric(df.get('koi_ror'), errors='coerce')
 
     with np.errstate(divide='ignore', invalid='ignore'):
         term_inside = ((1 + safe_div(prad, srad))**2) - (impact**2)
@@ -110,6 +110,7 @@ def auto_transform(df_orig: pd.DataFrame, sample_stats_df: pd.DataFrame | None =
     df['log_depth']  = safe_log10(depth)
     df['log_prad']   = safe_log10(pd.to_numeric(df.get('koi_prad'), errors='coerce'))
     df['log_teq']    = safe_log10(teq)
+    df['caida_brillo'] = ror**2
     df['period_class'] = classify_period_series(kp)
 
     # categorías

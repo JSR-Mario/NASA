@@ -330,7 +330,7 @@ def _train_button_callback():
                         st.dataframe(fi.head(15))
                         if "importance" in fi.columns:
                             top = fi.sort_values("importance", ascending=False).head(15)
-                            st.bar_chart(top["importance"], sort=True)
+                            st.bar_chart(top["importance"], sort="importance")
                     except Exception:
                         try:
                             fi_df = pd.DataFrame(fi)
