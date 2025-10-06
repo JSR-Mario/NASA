@@ -11,7 +11,6 @@ from autogluon.tabular import TabularPredictor
 from sklearn.model_selection import train_test_split
 import json
 
-st.set_page_config(page_title="KOI Trainer - v0.0.1", layout="wide")
 st.title("KOI - Entrenar nuevo predictor (versión mínima)")
 
 

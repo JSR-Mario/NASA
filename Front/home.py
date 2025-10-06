@@ -6,7 +6,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-st.set_page_config(page_title="Mínima acción - Cazando exoplanetas", layout="wide")
 st.markdown(
     """
     <style>

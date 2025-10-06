@@ -1,0 +1,13 @@
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.env
+.envrc
+.git
+.gitignore
+data/
+.gitlab-ci.yml
+.vscode/
+.idea/
+*.log

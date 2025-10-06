@@ -4,7 +4,6 @@ from PIL import Image
 
 # --- CONFIGURACIÓN DE LA PÁGINA ---
 # El layout "wide" aprovecha mejor el espacio en pantallas grandes.
-st.set_page_config(page_title="Sobre Nosotros", page_icon="👥", layout="wide")
 
 
 # --- DATOS DEL EQUIPO ---

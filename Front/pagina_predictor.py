@@ -6,7 +6,6 @@ import numpy as np
 from autogluon.tabular import TabularPredictor
 from transform_input import auto_transform, load_sample_stats
 
-st.set_page_config(page_title="KOI Predictor - v0.0.1", layout="wide")
 st.title("KOI Predictor")
 
 def _load_predictor(path):
